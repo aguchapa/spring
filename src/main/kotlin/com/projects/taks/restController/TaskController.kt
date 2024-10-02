@@ -1,9 +1,9 @@
 package com.projects.taks.restController
 
 
-import com.projects.taks.model.Category
-import com.projects.taks.model.State
+import com.projects.taks.exception.TaskNotFoundException
 import com.projects.taks.model.Task
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -13,41 +13,43 @@ class TaskController {
     private val tasks = mutableListOf<Task>()
 
     @GetMapping
-    fun getAllTask(): List<Task> {
-        println(tasks)
-        return tasks
+    fun getAllTask(): ResponseEntity<MutableList<Task>> {
 
+        return ResponseEntity.ok(tasks)
     }
 
     @PostMapping
-    fun addTask(@RequestBody task: Task) {
+    fun addTask(@RequestBody task: Task): ResponseEntity<Task> {
         tasks.add(task)
+
+        return ResponseEntity.ok(task)
     }
 
     @GetMapping("/category/{category}")
-    fun getTaskByCategory(@PathVariable category: String): List<Task> {
-        return tasks.filter { it.category.name.equals(category, true) }
+    fun getTaskByCategory(@PathVariable category: String): ResponseEntity<List<Task>> {
+
+        val list = tasks.filter { it.category.name.equals(category, true) }
+        if (list.isEmpty()) throw TaskNotFoundException("$category no encontrada")
+
+        return ResponseEntity.ok(list)
     }
 
     @PutMapping("/{id}")
     fun updateTask(
-        @PathVariable id: String, @RequestBody updatedTask:
-        UpdateTask
-    ) {
-        val task = tasks.find { it.id == id }
-        task?.let {
+        @PathVariable id: String, @RequestBody updatedTask: Task
+    ): ResponseEntity<Task> {
+        val task = tasks.find { it.id == id } ?: throw TaskNotFoundException("Task con id $id no encontrada")
+        task.let {
             it.title = updatedTask.title
             it.description = updatedTask.description
-            it.state = State.valueOf(updatedTask.state)
-            it.category = Category.valueOf(updatedTask.category)
+            it.state = updatedTask.state
+            it.category = updatedTask.category
         }
+        return ResponseEntity.ok(task)
     }
 
     @DeleteMapping("/{id}")
     fun deleteBook(@PathVariable id: String) {
-        tasks.removeIf { it.id == id }
+        if (!tasks.removeIf { it.id == id }) throw TaskNotFoundException("Task con id $id no encontrada") else ResponseEntity.ok()
     }
-
-    data class UpdateTask(val title: String, val description: String, val state: String, val category: String)
-
 }
