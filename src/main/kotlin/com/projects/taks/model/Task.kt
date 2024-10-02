@@ -4,7 +4,6 @@ data class Task(val id: String, var title: String, var description: String, var 
 
 }
 
-
 enum class State {
     COMPLETE,
     INCOMPLETE
@@ -14,5 +13,4 @@ enum class Category {
     ADMIN,
     DESIGN,
     FUNCTIONAL,
-
 }

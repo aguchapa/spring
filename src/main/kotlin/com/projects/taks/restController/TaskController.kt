@@ -18,25 +18,28 @@ class TaskController {
         return tasks
 
     }
+
     @PostMapping
     fun addTask(@RequestBody task: Task) {
         tasks.add(task)
     }
 
     @GetMapping("/category/{category}")
-    fun getTaskByCategory(@PathVariable  category: String): List<Task> {
+    fun getTaskByCategory(@PathVariable category: String): List<Task> {
         return tasks.filter { it.category.name.equals(category, true) }
-        }
+    }
 
     @PutMapping("/{id}")
-    fun updateTask(@PathVariable id: String, @RequestBody updatedTask:
-    UpdateTask) {
+    fun updateTask(
+        @PathVariable id: String, @RequestBody updatedTask:
+        UpdateTask
+    ) {
         val task = tasks.find { it.id == id }
         task?.let {
             it.title = updatedTask.title
             it.description = updatedTask.description
             it.state = State.valueOf(updatedTask.state)
-            it.category= Category.valueOf(updatedTask.category)
+            it.category = Category.valueOf(updatedTask.category)
         }
     }
 
@@ -46,7 +49,5 @@ class TaskController {
     }
 
     data class UpdateTask(val title: String, val description: String, val state: String, val category: String)
-
-
 
 }
