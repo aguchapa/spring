@@ -6,17 +6,15 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 
+
+@ControllerAdvice
 class ExceptionController {
 
-    @ControllerAdvice
-    class ExceptionController {
-
-        @ExceptionHandler(TaskNotFoundException::class)
-        @ResponseStatus(HttpStatus.NOT_FOUND)
-        fun handleBookNotFound(ex: TaskNotFoundException): ResponseEntity<String> {
-            return ResponseEntity(ex.message, HttpStatus.NOT_FOUND)
-        }
-
+    @ExceptionHandler(TaskNotFoundException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun handleBookNotFound(ex: TaskNotFoundException): ResponseEntity<String> {
+        return ResponseEntity(ex.message, HttpStatus.NOT_FOUND)
     }
 
 }
+

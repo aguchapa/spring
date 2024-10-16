@@ -18,19 +18,21 @@ class TaskController {
 
     @PostMapping
     fun addTask(@RequestBody task: Task): ResponseEntity<Task> {
+
         tasks.add(task)
 
         return ResponseEntity(task, HttpStatus.CREATED)
     }
 
-    @GetMapping("/category/{category}")
-    fun getTaskByCategory(@PathVariable category: String): List<Task> {
+    @GetMapping("/{id}")
+    fun getTaskById(@PathVariable id: String): Task =
+        tasks.find { it.id.equals(id, true) } ?: throw TaskNotFoundException("Task con id $id no encontrada")
 
-        val list = tasks.filter { it.category.name.equals(category, true) }
-        if (list.isEmpty()) throw TaskNotFoundException("$category no encontrada")
+    @GetMapping("/filter")
+    fun getTaskByCategory(@RequestParam category: String): List<Task> =
+        tasks.filter { it.category.name.equals(category, true) }
+            .ifEmpty { throw TaskNotFoundException("tasks con categoria $category no encontrada") }
 
-        return list
-    }
 
     @PutMapping("/{id}")
     fun updateTask(
